@@ -1,168 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Donation and Member Engagement Portal</title>
+    <title>DMEP - Donation & Member Engagement Portal</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <!-- Our CSS -->
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .hero-section {
+            min-height: 520px;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #eef5f1 100%);
+        }
+
+        .hero-icon {
+            font-size: 170px;
+            opacity: 0.9;
+        }
+
+        .feature-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.10) !important;
+        }
+
+        .feature-icon {
+            width: 75px;
+            height: 75px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 32px;
+        }
+
+        .section-space {
+            padding-top: 80px;
+            padding-bottom: 80px;
+        }
+    </style>
 </head>
+
 
 <body>
 
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+<!-- ===================================================== -->
+<!-- NAVBAR -->
+<!-- ===================================================== -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+
     <div class="container">
 
-        <a class="navbar-brand" href="/">
+        <!-- DMEP -->
+        <a class="navbar-brand fw-bold fs-4"
+           href="{{ url_for('main.home') }}">
+
+            <i class="bi bi-heart-fill text-danger me-1"></i>
             DMEP
+
         </a>
+
 
         <button class="navbar-toggler"
                 type="button"
                 data-bs-toggle="collapse"
-                data-bs-target="#navbarMenu">
+                data-bs-target="#mainNavbar">
+
             <span class="navbar-toggler-icon"></span>
+
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarMenu">
 
-            <ul class="navbar-nav ms-auto">
+        <div class="collapse navbar-collapse"
+             id="mainNavbar">
+
+
+            <!-- LEFT MENU -->
+
+            <ul class="navbar-nav me-auto">
 
                 <li class="nav-item">
-                    <a class="nav-link active" href="/">Home</a>
+                    <a class="nav-link active"
+                       href="{{ url_for('main.home') }}">
+                        Home
+                    </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Donate</a>
-                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Members</a>
+                    <a class="nav-link"
+                       href="{{ url_for('donation.add_donation') }}">
+                        Donate
+                    </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Survey</a>
-                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Login</a>
+                    <a class="nav-link"
+                       href="#membership">
+                        Membership
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="#surveys">
+                        Surveys
+                    </a>
                 </li>
 
             </ul>
 
+
+
+            <!-- RIGHT MENU -->
+
+            <ul class="navbar-nav align-items-lg-center">
+
+
+                {% if session.get("user_id") %}
+
+
+                    <!-- LOGGED IN -->
+
+                    <li class="nav-item me-lg-3">
+
+                        <span class="navbar-text text-light">
+
+                            <i class="bi bi-person-circle me-1"></i>
+
+                            Welcome,
+                            <strong>
+                                {{ session.get("user_name") }}
+                            </strong>
+
+                        </span>
+
+                    </li>
+
+
+                    <!-- ADMIN ONLY -->
+
+                    {% if session.get("role", "").lower() == "admin" %}
+
+                    <li class="nav-item">
+
+                        <a class="nav-link"
+                           href="{{ url_for('admin.dashboard') }}">
+
+                            <i class="bi bi-speedometer2"></i>
+                            Dashboard
+
+                        </a>
+
+                    </li>
+
+                    {% endif %}
+
+
+                    <!-- LOGOUT -->
+
+                    <li class="nav-item">
+
+                        <a class="btn btn-outline-light btn-sm ms-lg-2"
+                           href="{{ url_for('auth.logout') }}">
+
+                            Logout
+
+                        </a>
+
+                    </li>
+
+
+                {% else %}
+
+
+                    <!-- REGISTER - ONLY ONE MAIN REGISTER LINK -->
+
+                    <li class="nav-item">
+
+                        <a class="nav-link"
+                           href="{{ url_for('auth.register') }}">
+
+                            Register
+
+                        </a>
+
+                    </li>
+
+
+                    <!-- LOGIN -->
+
+                    <li class="nav-item">
+
+                        <a class="btn btn-outline-light btn-sm ms-lg-2"
+                           href="{{ url_for('auth.login') }}">
+
+                            Login
+
+                        </a>
+
+                    </li>
+
+
+                {% endif %}
+
+
+            </ul>
+
         </div>
+
     </div>
+
 </nav>
 
 
-<!-- Main Welcome Section -->
-<section class="hero">
 
-    <div class="container text-center">
+<!-- ===================================================== -->
+<!-- HERO -->
+<!-- ===================================================== -->
 
-        <h1>Donation and Member Engagement Portal</h1>
+<section class="hero-section">
 
-        <p class="lead">
-            Supporting our community through donations,
-            membership and engagement.
-        </p>
+    <div class="container">
 
-        <a href="#" class="btn btn-primary btn-lg">
-            Donate Now
-        </a>
+        <div class="row align-items-center">
+
+
+            <!-- LEFT -->
+
+            <div class="col-lg-7">
+
+
+                {% if session.get("user_id") %}
+
+                <span class="badge bg-success mb-3 px-3 py-2">
+
+                    <i class="bi bi-check-circle me-1"></i>
+
+                    Welcome back,
+                    {{ session.get("user_name") }}
+
+                </span>
+
+                {% endif %}
+
+
+                <h1 class="display-4 fw-bold">
+
+                    Supporting Our Community,
+                    Together.
+
+                </h1>
+
+
+                <p class="lead text-muted mt-3 mb-4">
+
+                    A simple platform for donations,
+                    membership and community engagement.
+
+                </p>
+
+
+                <!-- PRIMARY ACTION -->
+
+                <a href="{{ url_for('donation.add_donation') }}"
+                   class="btn btn-success btn-lg px-4">
+
+                    <i class="bi bi-heart-fill me-2"></i>
+
+                    Donate Now
+
+                </a>
+
+
+                <!-- Only show login beside donate -->
+
+                {% if not session.get("user_id") %}
+
+                <a href="{{ url_for('auth.login') }}"
+                   class="btn btn-outline-dark btn-lg px-4 ms-2">
+
+                    Member Login
+
+                </a>
+
+                {% endif %}
+
+
+                <!-- ADMIN -->
+
+                {% if session.get("role", "").lower() == "admin" %}
+
+                <a href="{{ url_for('admin.dashboard') }}"
+                   class="btn btn-primary btn-lg px-4 ms-2">
+
+                    Dashboard
+
+                </a>
+
+                {% endif %}
+
+
+            </div>
+
+
+
+            <!-- RIGHT -->
+
+            <div class="col-lg-5 text-center d-none d-lg-block">
+
+                <i class="bi bi-people-fill text-success hero-icon"></i>
+
+            </div>
+
+
+        </div>
 
     </div>
 
 </section>
 
 
-<!-- About Section -->
-<section class="container py-5">
 
-    <div class="text-center mb-5">
+<!-- ===================================================== -->
+<!-- MAIN FEATURES -->
+<!-- ===================================================== -->
 
-        <h2>Welcome to Our Community</h2>
+<section class="section-space">
 
-        <p>
-            Our portal makes it easier for supporters and members
-            to stay connected with the club. You can make donations,
-            participate in surveys and support our community activities.
-        </p>
-
-    </div>
+    <div class="container">
 
 
-    <!-- Feature Cards -->
-    <div class="row g-4">
+        <div class="text-center mb-5">
 
-        <div class="col-md-4">
-            <div class="card h-100 text-center shadow-sm">
+            <span class="text-success fw-semibold">
+                DMEP
+            </span>
 
-                <div class="card-body">
+            <h2 class="fw-bold mt-2">
+                Community Engagement Made Simple
+            </h2>
 
-                    <h3 class="card-title">Donations</h3>
+            <p class="text-muted">
+                Everything in one place for our community.
+            </p>
 
-                    <p class="card-text">
-                        Support the club by making a donation through
-                        our simple donation portal.
-                    </p>
-
-                    <a href="#" class="btn btn-outline-primary">
-                        Donate
-                    </a>
-
-                </div>
-            </div>
         </div>
 
 
-        <div class="col-md-4">
-            <div class="card h-100 text-center shadow-sm">
 
-                <div class="card-body">
+        <div class="row g-4">
 
-                    <h3 class="card-title">Members</h3>
 
-                    <p class="card-text">
-                        Keep members connected and informed about
-                        club activities and community events.
-                    </p>
+            <!-- DONATION -->
 
-                    <a href="#" class="btn btn-outline-primary">
-                        Learn More
-                    </a>
+            <div class="col-md-4">
+
+                <div class="card feature-card h-100 border-0 shadow-sm">
+
+                    <div class="card-body text-center p-5">
+
+
+                        <div class="feature-icon bg-danger-subtle text-danger mb-3">
+
+                            <i class="bi bi-heart-fill"></i>
+
+                        </div>
+
+
+                        <h4 class="fw-bold">
+                            Donations
+                        </h4>
+
+
+                        <p class="text-muted">
+
+                            Make a contribution and help
+                            support community projects and
+                            volunteer activities.
+
+                        </p>
+
+
+                        <a href="{{ url_for('donation.add_donation') }}"
+                           class="btn btn-success">
+
+                            Donate
+
+                        </a>
+
+
+                    </div>
 
                 </div>
+
             </div>
-        </div>
 
 
-        <div class="col-md-4">
-            <div class="card h-100 text-center shadow-sm">
 
-                <div class="card-body">
+            <!-- MEMBERSHIP -->
 
-                    <h3 class="card-title">Surveys</h3>
+            <div class="col-md-4"
+                 id="membership">
 
-                    <p class="card-text">
-                        Participate in club surveys and help us
-                        understand the views of our community.
-                    </p>
+                <div class="card feature-card h-100 border-0 shadow-sm">
 
-                    <a href="#" class="btn btn-outline-primary">
-                        View Surveys
-                    </a>
+                    <div class="card-body text-center p-5">
+
+
+                        <div class="feature-icon bg-primary-subtle text-primary mb-3">
+
+                            <i class="bi bi-person-badge-fill"></i>
+
+                        </div>
+
+
+                        <h4 class="fw-bold">
+                            Membership
+                        </h4>
+
+
+                        <p class="text-muted">
+
+                            Join the organisation and
+                            participate in community
+                            activities and engagement.
+
+                        </p>
+
+
+                        {% if not session.get("user_id") %}
+
+                        <a href="{{ url_for('auth.register') }}"
+                           class="btn btn-outline-primary">
+
+                            Join the Community
+
+                        </a>
+
+                        {% else %}
+
+                        <span class="badge bg-success px-3 py-2">
+
+                            <i class="bi bi-check-circle"></i>
+                            Member Access
+
+                        </span>
+
+                        {% endif %}
+
+
+                    </div>
 
                 </div>
+
             </div>
+
+
+
+            <!-- SURVEY -->
+
+            <div class="col-md-4"
+                 id="surveys">
+
+                <div class="card feature-card h-100 border-0 shadow-sm">
+
+                    <div class="card-body text-center p-5">
+
+
+                        <div class="feature-icon bg-success-subtle text-success mb-3">
+
+                            <i class="bi bi-clipboard-check-fill"></i>
+
+                        </div>
+
+
+                        <h4 class="fw-bold">
+                            Surveys
+                        </h4>
+
+
+                        <p class="text-muted">
+
+                            Share feedback and participate
+                            in surveys that help improve
+                            community activities.
+
+                        </p>
+
+
+                        <span class="badge bg-secondary px-3 py-2">
+
+                            Coming Soon
+
+                        </span>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
         </div>
 
     </div>
@@ -170,22 +531,198 @@
 </section>
 
 
-<!-- Footer -->
-<footer class="bg-dark text-white text-center py-4">
 
-    <p class="mb-1">
-        Donation and Member Engagement Portal
-    </p>
+<!-- ===================================================== -->
+<!-- COMMUNITY SECTION -->
+<!-- ===================================================== -->
 
-    <small>
-        ICT802 Capstone Project - Group 72
-    </small>
+<section class="bg-dark text-white section-space">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+
+            <div class="col-lg-7">
+
+
+                <span class="text-success fw-semibold">
+                    OUR COMMUNITY
+                </span>
+
+
+                <h2 class="fw-bold mt-2">
+                    Every Contribution Matters
+                </h2>
+
+
+                <p class="text-light-emphasis mt-3">
+
+                    DMEP helps bring donations,
+                    membership and engagement together
+                    in one simple portal.
+
+                </p>
+
+
+                <p class="text-light-emphasis">
+
+                    Visitors can donate without creating
+                    an account, while registered members
+                    can log in and access member features.
+
+                </p>
+
+
+                <a href="{{ url_for('donation.add_donation') }}"
+                   class="btn btn-success mt-2">
+
+                    <i class="bi bi-heart-fill me-1"></i>
+
+                    Support the Community
+
+                </a>
+
+
+            </div>
+
+
+
+            <div class="col-lg-5 text-center mt-5 mt-lg-0">
+
+                <i class="bi bi-globe2"
+                   style="font-size: 110px;">
+                </i>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ===================================================== -->
+<!-- SIMPLE MEMBERSHIP CTA -->
+<!-- ===================================================== -->
+
+{% if not session.get("user_id") %}
+
+<section class="section-space">
+
+    <div class="container">
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body p-5">
+
+                <div class="row align-items-center">
+
+
+                    <div class="col-md-8">
+
+                        <h3 class="fw-bold">
+                            Want to get involved?
+                        </h3>
+
+                        <p class="text-muted mb-md-0">
+
+                            Create a member account to join
+                            our community and access future
+                            member engagement features.
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+                        <a href="{{ url_for('auth.register') }}"
+                           class="btn btn-primary btn-lg">
+
+                            <i class="bi bi-person-plus me-1"></i>
+
+                            Become a Member
+
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<footer class="bg-dark text-white border-top border-secondary py-4">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+
+            <div class="col-md-6">
+
+                <span class="fw-bold">
+
+                    <i class="bi bi-heart-fill text-danger me-1"></i>
+
+                    DMEP
+
+                </span>
+
+                <span class="text-secondary ms-2">
+
+                    Donation & Member Engagement Portal
+
+                </span>
+
+            </div>
+
+
+            <div class="col-md-6 text-md-end mt-2 mt-md-0">
+
+                <small class="text-secondary">
+
+                    ICT802 Capstone Project
+
+                </small>
+
+            </div>
+
+
+        </div>
+
+    </div>
 
 </footer>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+
+<!-- Bootstrap JavaScript -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
 </script>
 
+
 </body>
+
 </html>
